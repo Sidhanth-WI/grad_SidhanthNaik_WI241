@@ -1,0 +1,4 @@
+In Jenkins I have created a new freestyle project.
+In it I have connected the Source Code Management to my GitHub repo-https://github.com/Sidhanth-WI/Jenkins-assignment.
+In the triggers section I have enabled poll SCM which checks my GitHub every minute for any new commits.
+If a new commit is found it will execute the commands given in the build steps.
