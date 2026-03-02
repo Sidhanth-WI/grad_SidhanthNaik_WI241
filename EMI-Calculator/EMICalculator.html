@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EMI Calculator</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        form {
+            width: 400px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+        }
+
+        .error {
+            border: 2px solid red;
+        }
+
+        .emi-output {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h2>EMI Calculator</h2>
+
+<form id="emiForm">
+
+    <label>Applicant</label>
+    <input type="text" id="applicant">
+
+    <label>Type</label>
+    <select id="loanType">
+        <option value="">-- Select Loan Type --</option>
+        <option value="home">Home</option>
+        <option value="car">Car</option>
+        <option value="personal">Personal</option>
+    </select>
+
+    <label>Interest (%)</label>
+    <input type="number" id="interest" readonly>
+
+    <label>Amount</label>
+    <input type="number" id="amount">
+
+    <label>Duration (Years)</label>
+    <input type="number" id="duration">
+
+    <label>EMI</label>
+    <div class="emi-output" id="emiResult">-</div>
+
+    <button type="button" onclick="calculateEMI()">Calculate EMI</button>
+
+</form>
+
+<script>
+
+const loanType = document.getElementById("loanType");
+const interest = document.getElementById("interest");
+const amount = document.getElementById("amount");
+const duration = document.getElementById("duration");
+const applicant = document.getElementById("applicant");
+
+loanType.addEventListener("change", function() {
+
+    // Remove error styles
+    clearErrors();
+
+    if (loanType.value === "home") {
+        interest.value = 9;
+        amount.min = 500000;
+        duration.max = 30;
+    }
+    else if (loanType.value === "car") {
+        interest.value = 12;
+        amount.min = 100000;
+        duration.max = 7;
+    }
+    else if (loanType.value === "personal") {
+        interest.value = 15;
+        amount.min = 10000;
+        duration.max = 3;
+    }
+    else {
+        interest.value = "";
+    }
+});
+
+function calculateEMI() {
+
+    clearErrors();
+    let isValid = true;
+
+    const P = parseFloat(amount.value);
+    const annualRate = parseFloat(interest.value);
+    const years = parseFloat(duration.value);
+
+    // Validation
+    if (!applicant.value.trim()) {
+        applicant.classList.add("error");
+        isValid = false;
+        
+    }
+
+    if (!loanType.value) {
+        loanType.classList.add("error");
+        isValid = false;
+    }
+
+    if (!P || P < parseFloat(amount.min)) {
+        amount.classList.add("error");
+        isValid = false;
+    }
+
+    if (!years || years > parseFloat(duration.max)) {
+        duration.classList.add("error");
+        isValid = false;
+    }
+
+    if (!isValid) {
+        document.getElementById("emiResult").innerText = "-";
+        return;
+    }
+
+    // EMI Formula
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+
+    const emi = (P * r * Math.pow(1 + r, n)) /
+                (Math.pow(1 + r, n) - 1);
+
+    document.getElementById("emiResult").innerText =
+        "₹ " + emi.toFixed(2);
+}
+
+function clearErrors() {
+    document.querySelectorAll("input, select").forEach(el => {
+        el.classList.remove("error");
+    });
+}
+
+</script>
+
+</body>
+</html>
